@@ -206,6 +206,7 @@ def main():
                 )
 
     elif selection == "General Analytics":
+        metrics = get_summary_metrics(filtered_data)
         st.markdown('<div class="section-header-compact">🏥 GENERAL WARD INTELLIGENCE</div>', unsafe_allow_html=True)
         
         k1, k2, k3 = st.columns(3)
@@ -256,6 +257,7 @@ def main():
         render_emergency_content(metrics)
 
     elif selection == "Bed Occupancy":
+        metrics = get_summary_metrics(filtered_data)
         # 1. TOP KPI STRIP (5 CARDS)
         k1, k2, k3, k4, k5 = st.columns(5)
         with k1: render_kpi_compact("ICU Occupancy", "88%", "22/25 Beds", "Critical", "red")
@@ -482,12 +484,17 @@ def main():
         pass
 
     elif selection == "Resource Management":
+        metrics = get_summary_metrics(filtered_data)
         # 1. TOP KPI STRIP (4 CARDS)
-        k1, k2, k3, k4 = st.columns(4)
-        with k1: render_kpi_compact("Staff On Duty", f"{metrics['avg_staff']:.0f}", "Current Shift", "Stable", "blue")
-        with k2: render_kpi_compact("Efficiency Score", "91%", "System Wide", "High", "green")
-        with k3: render_kpi_compact("Emergency Pool", "12", "On Standby", "Ready", "cyan")
-        with k4: render_kpi_compact("System Status", "Sync", "08:00 - 16:00", "Live", "orange")
+        @st.fragment
+        def render_resource_kpis(metrics):
+            k1, k2, k3, k4 = st.columns(4)
+            with k1: render_kpi_compact("Staff On Duty", f"{metrics['avg_staff']:.0f}", "Current Shift", "Stable", "blue")
+            with k2: render_kpi_compact("Efficiency Score", "91%", "System Wide", "High", "green")
+            with k3: render_kpi_compact("Emergency Pool", "12", "On Standby", "Ready", "cyan")
+            with k4: render_kpi_compact("System Status", "Sync", "08:00 - 16:00", "Live", "orange")
+
+        render_resource_kpis(metrics)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
