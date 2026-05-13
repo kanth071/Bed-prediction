@@ -2,16 +2,13 @@
 # PREMIUM ENTERPRISE SIDEBAR 
 # =========================================================
 
+import os
 import streamlit as st
 import pandas as pd
-
 
 def render_sidebar(data):
     """Render the ultra-premium sidebar with custom navigation."""
 
-    # 1. SIDEBAR BRANDING (Optimized for High-Res Logo)
-    import os
-    
     logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
     
     with st.sidebar.container():
@@ -75,8 +72,9 @@ def render_sidebar(data):
         
         # Use key to maintain state
         if st.sidebar.button(label, key=f"nav_{item}", use_container_width=True):
-            st.session_state.nav_state = item
-            st.rerun()
+            if st.session_state.nav_state != item:
+                st.session_state.nav_state = item
+                st.rerun()
 
 
 
