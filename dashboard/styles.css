@@ -488,3 +488,10 @@ button[title="Enlarge image"],
     padding: 5px !important;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
 }
+/* Final fix for unwanted text at top */
+[data-testid='stSidebarCollapseButton'], 
+#stSidebarCollapseButton,
+header[data-testid='stHeader'] {
+    display: none !important;
+    visibility: hidden !important;
+}
