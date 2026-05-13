@@ -123,7 +123,7 @@ def main():
     st.markdown(
         f"""
         <div style="display:flex; justify-content:space-between; align-items:center; padding:5px 0; margin-bottom:20px; border-bottom:1px solid var(--border-glass);">
-            <div style="font-size:1.1rem; font-weight:800; letter-spacing:0.5px; color:var(--text-primary);">BEDFORECAST COMMAND CENTER <span style="color:var(--text-muted); font-weight:400; font-size:0.85rem;">| {selection.upper()} | {datetime.datetime.now().strftime("%d/%m/%Y")}</span></div>
+            <div style="font-size:1.1rem; font-weight:800; letter-spacing:0.5px; color:var(--text-primary);">BEDFORECAST COMMAND CENTER <span style="color:var(--text-muted); font-weight:400; font-size:0.85rem;">| {selection.upper()} | 13/05/2026</span></div>
             <div style="font-size:0.8rem; font-weight:700; color:var(--neon-blue); letter-spacing:1px;">AI CONFIDENCE: 94.2%</div>
         </div>
         """,
