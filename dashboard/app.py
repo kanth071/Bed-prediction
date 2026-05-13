@@ -121,12 +121,6 @@ def main():
         (data['Date'] <= pd.to_datetime(end_date))
     ]
 
-    # 2. Filter Data by Sector
-    if selected_sector != "All Units":
-        filtered_data = filtered_data[filtered_data['service'] == selected_sector]
-
-    metrics = get_summary_metrics(filtered_data)
-
     # 1. Header
     st.markdown(
         f"""
@@ -139,9 +133,12 @@ def main():
     )
 
     if selection == "Dashboard Overview":
+        # Only calculate metrics needed for this page
+        metrics = get_summary_metrics(filtered_data)
+        
         # 2. TOP: KPI CARDS
         @st.fragment
-        def render_overview_kpis():
+        def render_overview_kpis(metrics):
             k1, k2, k3, k4, k5 = st.columns(5)
             with k1: render_kpi_compact("Total Admissions", f"{metrics['total_admissions']:,}", "Daily Patients", "Stable", "blue")
             with k2: render_kpi_compact("ICU Occupancy", f"{metrics['icu_load']:,}", "Beds Occupied", "Critical", "red")
@@ -149,7 +146,7 @@ def main():
             with k4: render_kpi_compact("General Demand", f"{metrics['general_load']:,}", "Ward Patients", "Stable", "green")
             with k5: render_kpi_compact("Utilization", f"{metrics['avg_occupancy']:.1f}%", "System Load", "Stable", "cyan")
 
-        render_overview_kpis()
+        render_overview_kpis(metrics)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -223,32 +220,40 @@ def main():
             st.plotly_chart(plot_advanced_forecast(gen_preds, title="General Ward Demand Forecast", height=400), use_container_width=True)
 
     elif selection == "ICU Analytics":
+        metrics = get_summary_metrics(filtered_data)
         st.markdown('<div class="section-header-compact">🏩 ICU CRITICAL CARE INTELLIGENCE</div>', unsafe_allow_html=True)
         
-        k1, k2, k3 = st.columns(3)
-        with k1: render_kpi_compact("ICU Occupancy", f"{metrics['icu_load']:,}", "Beds Occupied", "Critical", "red")
-        with k2: render_kpi_compact("Ventilator Use", "18", "Active Units", "High", "orange")
-        with k3: render_kpi_compact("Staff Ratio", "1:2", "Nurse-to-Patient", "Stable", "green")
+        @st.fragment
+        def render_icu_content(metrics):
+            i1, i2, i3 = st.columns(3)
+            with i1: render_kpi_compact("ICU Occupancy", f"{metrics['icu_load']:,}", "Beds Occupied", "Critical", "red")
+            with i2: render_kpi_compact("Ventilator Use", "18", "Active Units", "Stable", "blue")
+            with i3: render_kpi_compact("Staff Ratio", "1:2", "Nurse-to-Patient", "Stable", "green")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            icu_pred = load_predictions("icu")
+            if icu_pred is not None:
+                st.plotly_chart(plot_advanced_forecast(icu_pred, "ICU Bed Demand Forecast"), use_container_width=True, config={'displayModeBar': False})
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        icu_preds = load_predictions("icu")
-        if icu_preds is not None:
-            st.plotly_chart(plot_advanced_forecast(icu_preds, title="ICU Occupancy Trend", height=400), use_container_width=True)
+        render_icu_content(metrics)
 
     elif selection == "Emergency Analytics":
+        metrics = get_summary_metrics(filtered_data)
         st.markdown('<div class="section-header-compact">🚑 EMERGENCY DEPARTMENT INTELLIGENCE</div>', unsafe_allow_html=True)
         
-        k1, k2, k3 = st.columns(3)
-        with k1: render_kpi_compact("Emergency Load", f"{metrics['emergency_load']:,}", "Current Cases", "Moderate", "orange")
-        with k2: render_kpi_compact("Avg Wait Time", "18m", "To See Physician", "Stable", "blue")
-        with k3: render_kpi_compact("Triage Count", "12", "In Processing", "Active", "cyan")
+        @st.fragment
+        def render_emergency_content(metrics):
+            e1, e2, e3 = st.columns(3)
+            with e1: render_kpi_compact("Emergency Load", f"{metrics['emergency_load']:,}", "Current Cases", "Moderate", "orange")
+            with e2: render_kpi_compact("Avg Wait Time", "18m", "To See Physician", "Stable", "green")
+            with e3: render_kpi_compact("Triage Count", "12", "In Processing", "Stable", "blue")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            em_pred = load_predictions("emergency")
+            if em_pred is not None:
+                st.plotly_chart(plot_advanced_forecast(em_pred, "Emergency Demand Forecast"), use_container_width=True, config={'displayModeBar': False})
 
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        em_preds = load_predictions("emergency")
-        if em_preds is not None:
-            st.plotly_chart(plot_advanced_forecast(em_preds, title="Emergency Demand Forecast", height=400), use_container_width=True)
+        render_emergency_content(metrics)
 
     elif selection == "Bed Occupancy":
         # 1. TOP KPI STRIP (5 CARDS)
