@@ -42,9 +42,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load CSS
-with open(os.path.join(os.path.dirname(__file__), "styles.css")) as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# =========================================================
+# ASSET CACHING
+# =========================================================
+
+@st.cache_data
+def load_css():
+    css_path = os.path.join(os.path.dirname(__file__), "styles.css")
+    with open(css_path) as f:
+        return f.read()
+
+st.markdown(f"<style>{load_css()}</style>", unsafe_allow_html=True)
 
 
 # =========================================================
@@ -131,14 +139,17 @@ def main():
     )
 
     if selection == "Dashboard Overview":
-        # ... (Dashboard Overview code remains same)
         # 2. TOP: KPI CARDS
-        k1, k2, k3, k4, k5 = st.columns(5)
-        with k1: render_kpi_compact("Total Admissions", f"{metrics['total_admissions']:,}", "Daily Patients", "Stable", "blue")
-        with k2: render_kpi_compact("ICU Occupancy", f"{metrics['icu_load']:,}", "Beds Occupied", "Critical", "red")
-        with k3: render_kpi_compact("Emergency Load", f"{metrics['emergency_load']:,}", "Current Cases", "Moderate", "orange")
-        with k4: render_kpi_compact("General Demand", f"{metrics['general_load']:,}", "Ward Patients", "Stable", "green")
-        with k5: render_kpi_compact("Utilization", f"{metrics['avg_occupancy']:.1f}%", "System Load", "Stable", "cyan")
+        @st.fragment
+        def render_overview_kpis():
+            k1, k2, k3, k4, k5 = st.columns(5)
+            with k1: render_kpi_compact("Total Admissions", f"{metrics['total_admissions']:,}", "Daily Patients", "Stable", "blue")
+            with k2: render_kpi_compact("ICU Occupancy", f"{metrics['icu_load']:,}", "Beds Occupied", "Critical", "red")
+            with k3: render_kpi_compact("Emergency Load", f"{metrics['emergency_load']:,}", "Current Cases", "Moderate", "orange")
+            with k4: render_kpi_compact("General Demand", f"{metrics['general_load']:,}", "Ward Patients", "Stable", "green")
+            with k5: render_kpi_compact("Utilization", f"{metrics['avg_occupancy']:.1f}%", "System Load", "Stable", "cyan")
+
+        render_overview_kpis()
 
         st.markdown("<br>", unsafe_allow_html=True)
 
