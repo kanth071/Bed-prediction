@@ -134,7 +134,7 @@ def main():
         # ... (Dashboard Overview code remains same)
         # 2. TOP: KPI CARDS
         k1, k2, k3, k4, k5 = st.columns(5)
-        with k1: render_kpi_compact("Total Admissions", f"{metrics['total_admissions']:,}", "Daily Patients", "Stable", "blue", filtered_data)
+        with k1: render_kpi_compact("Total Admissions", f"{metrics['total_admissions']:,}", "Daily Patients", "Stable", "blue")
         with k2: render_kpi_compact("ICU Occupancy", f"{metrics['icu_load']:,}", "Beds Occupied", "Critical", "red")
         with k3: render_kpi_compact("Emergency Load", f"{metrics['emergency_load']:,}", "Current Cases", "Moderate", "orange")
         with k4: render_kpi_compact("General Demand", f"{metrics['general_load']:,}", "Ward Patients", "Stable", "green")
